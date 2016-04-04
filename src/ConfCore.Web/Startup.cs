@@ -16,6 +16,8 @@ namespace ConfCore.Web
 {
     public class Startup
     {
+        private IHostingEnvironment _appEnv;
+
         public Startup(IHostingEnvironment env)
         {
             // Set up configuration sources.
@@ -31,6 +33,8 @@ namespace ConfCore.Web
 
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
+
+            _appEnv = env;
         }
 
         public IConfigurationRoot Configuration { get; set; }
@@ -54,27 +58,34 @@ namespace ConfCore.Web
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
 
-            services.AddEntityFramework()
-                .AddSqlServer()
-                .AddDbContext<ConfCoreDbContext>(options =>
-                    options.UseSqlServer(Configuration["Data:DefaultConnection:ConfCoreConnectionString"]));
-        }
+            //services.AddEntityFramework()
+            //    .AddSqlServer()
+            //    .AddDbContext<ConfCoreDbContext>(options =>
+            //        options.UseSqlServer(Configuration["Data:DefaultConnection:ConfCoreConnectionString"]));
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+            services.AddEntityFramework()
+                .AddSqlite()
+                .AddDbContext<ConfCoreDbContext>(
+                    options => { options.UseSqlite($"Data Source={_appEnv.WebRootPath.Replace("\\wwwroot", string.Empty)}/confCore.db"); });
+                    //options => { options.UseSqlite(Configuration["Data:DefaultConnection:ConfCoreConnectionString2"]); });
+        
+    }
+
+    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
+            app.UseDeveloperExceptionPage();
+            app.UseDatabaseErrorPage();
             if (env.IsDevelopment())
             {
                 app.UseBrowserLink();
-                app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                //app.UseExceptionHandler("/Home/Error");
 
                 // For more details on creating database during deployment see http://go.microsoft.com/fwlink/?LinkID=615859
                 try
