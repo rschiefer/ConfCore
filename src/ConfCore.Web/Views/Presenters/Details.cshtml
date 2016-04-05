@@ -1,7 +1,7 @@
 @model ConfCore.Web.Models.Presenter
 
 @{
-    Layout = null;
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <!DOCTYPE html>
@@ -12,10 +12,15 @@
     <title>Details</title>
 </head>
 <body>
-
+    <div id="blue">
+        <div class="container">
+            <div class="row">
+                <h3>Presenters</h3>
+            </div><!-- /row -->
+        </div> <!-- /container -->
+    </div><!-- /blue -->
+<div class="container">
 <div>
-    <h4>Presenter</h4>
-    <hr />
     <dl class="dl-horizontal">
         <dt>
             @Html.DisplayNameFor(model => model.Biography)
@@ -71,5 +76,6 @@
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </p>
+    </div>
 </body>
 </html>
