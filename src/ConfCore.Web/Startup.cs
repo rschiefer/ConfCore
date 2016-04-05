@@ -108,6 +108,17 @@ namespace ConfCore.Web
 
             app.UseIdentity();
 
+            app.Use(async (context, next) =>
+            {
+                //Clickjacking Fix
+                context.Response.Headers.Add("X-FRAME-OPTIONS", new[] { "DENY" });
+                //Excessive Headers Fix
+                context.Response.Headers.Remove("Server");
+
+                await next();
+            });
+
+
             // To configure external authentication please see http://go.microsoft.com/fwlink/?LinkID=532715
 
             app.UseMvc(routes =>
